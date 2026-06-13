@@ -4428,11 +4428,9 @@
                         status = "Round Off Difference";
                         explanation += ` Minor rate difference (within ±₹10).`;
                     } else if (diff > 0) {
+                        status = "Overcharged";
                         if (billedRate === valNum && discountApplied > 0) {
-                            status = "Unauthorized Discount";
                             explanation = `Billed at full rate (₹${valNum}) without contract discount (${discountApplied}%) expected ₹${expectedDiscountedRate}.`;
-                        } else {
-                            status = "Overcharged";
                         }
                     } else {
                         status = "Undercharged";
@@ -6369,11 +6367,10 @@
                         r.status = "Round Off Difference";
                         r.explanation = "Minor rate difference (within ±₹10).";
                     } else if (diffVal > 0) {
+                        r.status = "Overcharged";
                         if (r.billedRate === r.expectedTariff && r.discountApplied > 0) {
-                            r.status = "Unauthorized Discount";
                             r.explanation = `Billed at full rate (₹${r.expectedTariff}) without contract discount (${r.discountApplied}%) expected ₹${expectedDiscounted}.`;
                         } else {
-                            r.status = "Overcharged";
                             r.explanation = `Billed rate ₹${r.billedRate} is higher than contract rate ₹${expectedDiscounted} (Tariff ₹${r.expectedTariff} less ${r.discountApplied}% discount).`;
                         }
                     } else {
@@ -7073,11 +7070,9 @@
                 status = "Round Off Difference";
                 explanation += ` Minor rate difference (within ±₹10).`;
             } else if (diff > 0) {
+                status = "Overcharged";
                 if (billedRate === expectedTariff && discountApplied > 0) {
-                    status = "Unauthorized Discount";
                     explanation = `Billed at full rate (₹${expectedTariff}) without contract discount (${discountApplied}%) expected ₹${expectedDiscountedRate}.`;
-                } else {
-                    status = "Overcharged";
                 }
             } else {
                 status = "Undercharged";
