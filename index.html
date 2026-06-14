@@ -49,9 +49,10 @@
         }
 
         :root[data-theme="light"] {
-            --bg-page: #f3f7fa; /* Apollo light blueish-white */
-            --bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23004b87' fill-opacity='0.04' d='M0,96L48,112C96,128,192,160,288,181.3C384,203,480,213,576,197.3C672,181,768,139,864,122.7C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,0L1392,0L1152,0L864,0L576,0L288,0L0,0Z'%3E%3C/path%3E%3C/svg%3E"), 
-                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300a19c' fill-opacity='0.03' d='M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,138.7C672,149,768,203,864,213.3C960,224,1056,192,1152,170.7C1248,149,1344,139,1392,133.3L1440,128L1440,320L1392,320L1152,320L864,320L576,320L288,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            --bg-page: #f0f6fa; /* Whitish blue background */
+            --bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23004b87' fill-opacity='0.07' d='M0,160L48,154.7C96,149,192,139,288,149.3C384,160,480,192,576,197.3C672,203,768,181,864,165.3C960,149,1056,139,1152,144C1248,149,1344,171,1392,181.3L1440,192L1440,0L1392,0L1152,0L864,0L576,0L288,0L0,0Z'%3E%3C/path%3E%3C/svg%3E"), 
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%233b82f6' fill-opacity='0.05' d='M0,96L48,112C96,128,192,160,288,181.3C384,203,480,213,576,197.3C672,181,768,139,864,122.7C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,0L1392,0L1152,0L864,0L576,0L288,0L0,0Z'%3E%3C/path%3E%3C/svg%3E"),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%2300a19c' fill-opacity='0.04' d='M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,138.7C672,149,768,203,864,213.3C960,224,1056,192,1152,170.7C1248,149,1344,139,1392,133.3L1440,128L1440,320L1392,320L1152,320L864,320L576,320L288,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
             --bg-card: #ffffff;
             --bg-hover: #f1f5f9;
             --border: #e2e8f0;
@@ -85,16 +86,40 @@
 
         body {
             font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-page);
-            background-image: var(--bg-image);
-            background-repeat: no-repeat, no-repeat;
-            background-position: top, bottom;
-            background-size: 100% 250px, 100% 250px;
-            background-attachment: fixed, fixed;
             color: var(--text-main);
             min-height: 100vh;
             padding: 1.5rem;
             line-height: 1.5;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Theme-specific body backgrounds */
+        :root[data-theme="dark"] body {
+            background-color: var(--bg-page);
+            background-image: none;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: auto;
+            animation: none;
+        }
+
+        :root[data-theme="light"] body {
+            background-color: var(--bg-page);
+            background-image: var(--bg-image);
+            background-repeat: repeat-x, repeat-x, repeat-x;
+            background-position: 0px 0px, 0px 0px, 0px 100%;
+            background-size: 2880px 320px, 2880px 280px, 2880px 350px;
+            background-attachment: fixed, fixed, fixed;
+            animation: lightModeWaves 45s linear infinite;
+        }
+
+        @keyframes lightModeWaves {
+            0% {
+                background-position: 0px 0px, 0px 0px, 0px 100%;
+            }
+            100% {
+                background-position: 2880px 0px, -2880px 0px, 1440px 100%;
+            }
         }
 
         /* Scrollbar styling */
