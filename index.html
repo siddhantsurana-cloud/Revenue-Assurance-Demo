@@ -7981,7 +7981,44 @@
                             expectedTariff = null;
                         }
                     } else {
-                        if (serviceId === "2127" || nameUpper.includes("ROOM RENT") || nameUpper.includes("BED CHARGE") || deptLower.includes("room rent") || deptLower.includes("bed charge") || deptLower === "room" || nameUpper.includes("DELUXE CABIN") || nameUpper.includes("PRIVATE CABIN") || nameUpper.includes("SEMI CABIN")) {
+                        const isDayCareItem = isDayCare || nameUpper.includes("DAY CARE") || nameUpper.includes("DAYCARE");
+                        const isTriageItem = nameUpper.includes("TRIAGE") || deptLower.includes("triage") || rateType.toLowerCase().includes("triage");
+
+                        if (activeSOC === TARIFF_2021 && (isDayCareItem || isTriageItem)) {
+                            let start = parseExcelDate(startDateVal);
+                            let end = parseExcelDate(endDateVal);
+                            let durationHours = null;
+                            if (start && end && end >= start) {
+                                durationHours = (end - start) / (3600 * 1000);
+                            }
+                            if (isDayCareItem) {
+                                if (durationHours !== null) {
+                                    if (durationHours <= 1) expectedTariff = 300;
+                                    else if (durationHours <= 2) expectedTariff = 600;
+                                    else if (durationHours <= 3) expectedTariff = 900;
+                                    else if (durationHours <= 4) expectedTariff = 1200;
+                                    else if (durationHours <= 5) expectedTariff = 1500;
+                                    else if (durationHours <= 6) expectedTariff = 1800;
+                                    else expectedTariff = 2100;
+                                    explanation += ` Resolved 2021-22 Day Care hourly charge: ${durationHours.toFixed(1)} hours.`;
+                                } else {
+                                    expectedTariff = 2100;
+                                    explanation += " Resolved 2021-22 Day Care flat charge (no duration).";
+                                }
+                            } else {
+                                if (durationHours !== null) {
+                                    if (durationHours <= 1) expectedTariff = 0;
+                                    else if (durationHours <= 3) expectedTariff = 1500;
+                                    else if (durationHours <= 6) expectedTariff = 2000;
+                                    else if (durationHours <= 12) expectedTariff = 2200;
+                                    else expectedTariff = 2700;
+                                    explanation += ` Resolved 2021-22 Triage hourly charge: ${durationHours.toFixed(1)} hours.`;
+                                } else {
+                                    expectedTariff = 2700;
+                                    explanation += " Resolved 2021-22 Triage flat charge (no duration).";
+                                }
+                            }
+                        } else if (serviceId === "2127" || nameUpper.includes("ROOM RENT") || nameUpper.includes("BED CHARGE") || deptLower.includes("room rent") || deptLower.includes("bed charge") || deptLower === "room" || nameUpper.includes("DELUXE CABIN") || nameUpper.includes("PRIVATE CABIN") || nameUpper.includes("SEMI CABIN") || isDayCareItem || isTriageItem) {
                             if (activeBU === "excelcare") {
                                 expectedTariff = lookupExcelcareRoomRent(cleanedRoom, activeSourceVal);
                                 explanation += ` Resolved Excelcare Room Rent for ${cleanedRoom}.`;
