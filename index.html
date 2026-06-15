@@ -5114,9 +5114,9 @@
 
                     if (Math.abs(diff) < 0.1) {
                         status = "Matching";
-                    } else if (Math.abs(diff) <= 10) {
+                    } else if (Math.abs(diff) <= 1) {
                         status = "Round Off Difference";
-                        explanation += ` Minor rate difference (within ±₹10).`;
+                        explanation += ` Minor rate difference (within ±₹1).`;
                     } else if (diff > 0) {
                         status = "Overcharged";
                         if (billedRate === valNum && discountApplied > 0) {
@@ -7067,9 +7067,9 @@
                     const diffVal = r.diff;
                     if (Math.abs(diffVal) < 0.1) {
                         r.status = "Matching";
-                    } else if (Math.abs(diffVal) <= 10) {
+                    } else if (Math.abs(diffVal) <= 1) {
                         r.status = "Round Off Difference";
-                        r.explanation = "Minor rate difference (within ±₹10).";
+                        r.explanation = "Minor rate difference (within ±₹1).";
                     } else if (diffVal > 0) {
                         r.status = "Overcharged";
                         if (r.billedRate === r.expectedTariff && r.discountApplied > 0) {
@@ -7965,9 +7965,9 @@
 
             if (Math.abs(diff) < 0.1) {
                 status = "Matching";
-            } else if (Math.abs(diff) <= 10) {
+            } else if (Math.abs(diff) <= 1) {
                 status = "Round Off Difference";
-                explanation += ` Minor rate difference (within ±₹10).`;
+                explanation += ` Minor rate difference (within ±₹1).`;
             } else if (diff > 0) {
                 status = "Overcharged";
                 if (billedRate === expectedTariff && discountApplied > 0) {
@@ -8872,7 +8872,7 @@
                         rowObj.diff = rowObj.billedRate - netExpected;
                         if (Math.abs(rowObj.diff) < 0.1) {
                             rowObj.status = "Matching";
-                        } else if (Math.abs(rowObj.diff) <= 10) {
+                        } else if (Math.abs(rowObj.diff) <= 1) {
                             rowObj.status = "Round Off Difference";
                         } else if (rowObj.diff > 0) {
                             rowObj.status = "Overcharged";
@@ -8995,7 +8995,7 @@
                         row.diff = row.billedRate - netExpected;
                         if (Math.abs(row.diff) < 0.1) {
                             row.status = "Matching";
-                        } else if (Math.abs(row.diff) <= 10) {
+                        } else if (Math.abs(row.diff) <= 1) {
                             row.status = "Round Off Difference";
                         } else if (row.diff > 0) {
                             row.status = "Overcharged";
@@ -9007,7 +9007,7 @@
                     // Add detailed verification remark
                     let remark = ` [Anesthesia Audit] Verified 35% rate logic. Surgeon/Surgery Fee: Billed ₹${baseSurgeonBilled} (Expected ₹${baseSurgeonExpected}). Expected Anesthesia (35%): ₹${targetAnesExpected}.`;
                     
-                    if (Math.abs(row.billedRate - targetAnesBilled) > 10) {
+                    if (Math.abs(row.billedRate - targetAnesBilled) > 1) {
                         remark += ` ⚠️ Billed Anesthesia ₹${row.billedRate} does not match 35% of Surgeon/Surgery Fee (₹${targetAnesBilled}).`;
                     } else {
                         remark += ` Check Passed: Billed Anesthesia matches 35% of Surgeon/Surgery Fee.`;
