@@ -6864,6 +6864,35 @@
     };
 
     const ROOM_RENT_2024 = {
+        // Detailed Bed Categories from SOC 2024-25
+        "GENERAL WARD": 1200,
+        "AC GENERAL WARD": 1500,
+        "NON AC SEMI CABIN": 1800,
+        "AC SEMI CABIN": 2600,
+        "AC CABIN": 3400,
+        "PRIVATE CABIN (NON AC)": 2700,
+        "DELUXE CABIN": 5500,
+        "SUPER DELUXE": 7000,
+        "CRITICAL CARE UNIT": 6700,
+        "NICU/PICU": 3100,
+        "STEP DOWN ICU": 3800,
+        "CTVS ICU": 6600,
+        "NEURO ICU": 6700,
+        "CORONARY CARE UNIT (HCC)": 4700,
+        "CATH RECOVERY": 4700,
+        "CRITICAL CARE ISOLATION (ICU)": 7500,
+        "EMERGENCY WARD": 3400,
+        "MOTHER OCCUPIED": 1200,
+        "NURSERY CARE": 1000,
+        "DAY CARE 0 TO 1 HOUR": 300,
+        "DAY CARE 1 TO 2 HOURS": 600,
+        "DAY CARE 2 TO 3 HOURS": 900,
+        "DAY CARE 3 TO 4 HOURS": 1200,
+        "DAY CARE 4 TO 5 HOURS": 1500,
+        "DAY CARE 5 TO 6 HOURS": 1800,
+        "DAY CARE 5 TO 24 HOURS": 2100,
+        
+        // Standard simplified fallbacks
         "STANDARD WARD": 1200,
         "SEMI PRIVATE": 2600,
         "SINGLE PRIVATE": 3400,
@@ -6878,16 +6907,40 @@
     };
 
     const ROOM_RENT_2023 = {
+        // Detailed Bed Categories from SOC 2023-24
+        "GENERAL WARD": 1200,
+        "AC GENERAL WARD": 1500,
+        "NURSERY BED": 1200,
+        "PRIVATE-NON AC": 2700,
+        "SEMI PRIVATE -NON AC": 1800,
+        "SEMI PRIVATE-AC": 2600,
+        "DELUXE": 6200,
+        "PRIVATE -AC": 3400,
+        "ICU": 6700,
+        "SDU": 3800,
+        "CATH RECOVERY": 4700,
+        "HCC": 4700,
+        "NEURO ICU": 6700,
+        "CTVS ICU": 6600,
+        "SUPER DELUXE": 8000,
+        "NICU": 3100,
+        "PICU": 3100,
+        "DAY CARE 0 TO 1 HOUR": 300,
+        "DAY CARE 1 TO 2 HOURS": 600,
+        "DAY CARE 2 TO 3 HOURS": 900,
+        "DAY CARE 3 TO 4 HOURS": 1200,
+        "DAY CARE 4 TO 5 HOURS": 1500,
+        "DAY CARE 5 TO 6 HOURS": 1800,
+        "DAY CARE 5 TO 24 HOURS": 2100,
+        
+        // Standard simplified fallbacks
         "STANDARD WARD": 1200,
         "SEMI PRIVATE": 2600,
         "SINGLE PRIVATE": 3400,
-        "DELUXE": 6200,
         "SUITE": 13500,
-        "ICU": 6700,
         "ICCU": 6700,
         "HDU": 3800,
-        "NICU": 3100,
-        "PICU": 3100,
+        "NEONATAL ICU": 3100,
         "DAYCARE": 2100
     };
 
@@ -6905,7 +6958,7 @@
         "DAYCARE": 1500
     };
 
-    function lookupActiveRoomRent(activeSourceVal, activeSOC, cleanedRoom, isGipsa) {
+    function lookupActiveRoomRent(activeSourceVal, activeSOC, cleanedRoom, isGipsa, originalRoomCategory) {
         let year = "2024";
         const sourceVal = activeSourceVal || "";
         
@@ -6937,21 +6990,27 @@
             }
         }
 
+        const normRoom = originalRoomCategory ? originalRoomCategory.toUpperCase().trim() : "";
+
         if (year === "2025") {
+            if (normRoom && ROOM_RENT_2025[normRoom] !== undefined) return ROOM_RENT_2025[normRoom];
             return ROOM_RENT_2025[cleanedRoom] || ROOM_RENT_2025["DELUXE"] || 1600;
         } else if (year === "2024") {
+            if (normRoom && ROOM_RENT_2024[normRoom] !== undefined) return ROOM_RENT_2024[normRoom];
             return ROOM_RENT_2024[cleanedRoom] || ROOM_RENT_2024["DELUXE"] || 1600;
         } else if (year === "2023") {
+            if (normRoom && ROOM_RENT_2023[normRoom] !== undefined) return ROOM_RENT_2023[normRoom];
             return ROOM_RENT_2023[cleanedRoom] || ROOM_RENT_2023["DELUXE"] || 1600;
         } else if (year === "2021") {
+            if (normRoom && ROOM_RENT_2021[normRoom] !== undefined) return ROOM_RENT_2021[normRoom];
             return ROOM_RENT_2021[cleanedRoom] || ROOM_RENT_2021["DELUXE"] || 1600;
         }
         
         return ROOM_RENT_TPA[cleanedRoom] || ROOM_RENT_TPA["DELUXE"] || 1600;
     }
 
-    function lookupSOCRoomRent(socArray, cleanedRoom) {
-        return lookupActiveRoomRent("", socArray, cleanedRoom, false);
+    function lookupSOCRoomRent(socArray, cleanedRoom, originalRoomCategory) {
+        return lookupActiveRoomRent("", socArray, cleanedRoom, false, originalRoomCategory);
     }
 
     function readFileAsArrayBuffer(file) {
@@ -7808,7 +7867,7 @@
                                 expectedTariff = lookupExcelcareRoomRent(cleanedRoom, activeSourceVal);
                                 explanation += ` Resolved Excelcare Room Rent for ${cleanedRoom}.`;
                             } else {
-                                expectedTariff = lookupActiveRoomRent(activeSourceVal, activeSOC, cleanedRoom, isGipsa);
+                                expectedTariff = lookupActiveRoomRent(activeSourceVal, activeSOC, cleanedRoom, isGipsa, roomCategory);
                                 explanation += ` Resolved Room Rent for ${cleanedRoom}.`;
                             }
                         } else if (serviceId === "2126" || nameUpper.includes("NURSING AND ALLIED CHARGES")) {
