@@ -2239,15 +2239,15 @@
         </nav>
 
         <!-- Sidebar Favorites Bookmarks -->
-        <div class="sidebar-favorites-title" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0.25rem; padding: 0 0.5rem; letter-spacing: 0.05em;">★ Bookmarked Clients</div>
+        <div class="sidebar-favorites-title" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0.25rem; padding: 0 0.5rem; letter-spacing: 0.05em;">★ Hospital Units</div>
         <div class="sidebar-favorites-list" style="display: flex; flex-direction: column; gap: 0.25rem; padding: 0 0.5rem; margin-bottom: 1.5rem;">
-            <a href="#" onclick="window.selectContextClient('Apollo Excelcare')" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: var(--text-main); text-decoration: none; font-weight: 600; padding: 0.25rem 0.35rem; border-radius: 4px; transition: all 0.2s;">
+            <a href="#" onclick="window.selectContextUnit('Excelcare')" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: var(--text-main); text-decoration: none; font-weight: 600; padding: 0.25rem 0.35rem; border-radius: 4px; transition: all 0.2s;">
                 <span style="display: inline-block; width: 6px; height: 6px; background: var(--primary); border-radius: 50%;"></span>
-                Apollo Excelcare
+                Excelcare Unit
             </a>
-            <a href="#" onclick="window.selectContextClient('Apollo Christian Basti')" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: var(--text-main); text-decoration: none; font-weight: 600; padding: 0.25rem 0.35rem; border-radius: 4px; transition: all 0.2s;">
+            <a href="#" onclick="window.selectContextUnit('Christian Basti')" style="display: flex; align-items: center; gap: 0.35rem; font-size: 0.72rem; color: var(--text-main); text-decoration: none; font-weight: 600; padding: 0.25rem 0.35rem; border-radius: 4px; transition: all 0.2s;">
                 <span style="display: inline-block; width: 6px; height: 6px; background: var(--info); border-radius: 50%;"></span>
-                Apollo Christian Basti
+                Christian Basti Unit
             </a>
         </div>
     </aside>
@@ -2304,7 +2304,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem;">
                 <span style="color: var(--text-muted);">Client:</span>
-                <span id="context-client" style="font-weight: 700; color: var(--text-main);">Apollo Excelcare</span>
+                <span id="context-client" style="font-weight: 700; color: var(--text-main);">Apollo International</span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.35rem;">
                 <span style="color: var(--text-muted);">Business Unit:</span>
@@ -2340,7 +2340,7 @@
         <div class="controls-card" style="background-color: var(--bg-card); border-left: 5px solid var(--primary);">
             <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">BRC - Guwahati | Revenue Assurance & Agreement Intelligence</h3>
             <p style="color: var(--text-muted); font-size: 0.88rem; line-height: 1.5;">
-                Unified executive console monitoring the central agreement repository, schedule of charges (SOC) masters, and inter-unit pricing rules across Apollo Christian Basti and Excelcare units.
+                Unified executive console monitoring the central agreement repository, schedule of charges (SOC) masters, and inter-unit pricing rules across the Christian Basti and Excelcare hospital units of Apollo International.
             </p>
         </div>
 
@@ -4668,8 +4668,8 @@
         });
     }
 
-    // Select Client Context function
-    window.selectContextClient = function(clientName) {
+    // Select Hospital Unit Context function
+    window.selectContextUnit = function(unitName) {
         const clientSpan = document.getElementById('context-client');
         const unitSpan = document.getElementById('context-unit');
         const locationSpan = document.getElementById('context-location');
@@ -4677,13 +4677,16 @@
         const statusSpan = document.getElementById('context-status');
         const lastUpdatedSpan = document.getElementById('context-last-updated');
 
-        if (!clientSpan) return;
-
-        clientSpan.textContent = clientName;
+        if (clientSpan) {
+            clientSpan.textContent = 'Apollo International';
+        }
         
-        // Populate context details based on selected client
-        if (clientName === 'Apollo Excelcare') {
-            if (unitSpan) unitSpan.textContent = 'Excelcare';
+        if (unitSpan) {
+            unitSpan.textContent = unitName;
+        }
+        
+        // Populate context details based on selected unit
+        if (unitName === 'Excelcare') {
             if (locationSpan) locationSpan.textContent = 'Guwahati';
             if (periodSpan) periodSpan.textContent = 'FY 2026-27';
             if (statusSpan) {
@@ -4692,8 +4695,7 @@
                 statusSpan.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
                 statusSpan.style.color = 'var(--primary)';
             }
-        } else if (clientName === 'Apollo Christian Basti') {
-            if (unitSpan) unitSpan.textContent = 'Christian Basti';
+        } else if (unitName === 'Christian Basti') {
             if (locationSpan) locationSpan.textContent = 'Guwahati';
             if (periodSpan) periodSpan.textContent = 'FY 2025-26';
             if (statusSpan) {
@@ -4703,8 +4705,7 @@
                 statusSpan.style.color = 'var(--success)';
             }
         } else {
-            // General or other client
-            if (unitSpan) unitSpan.textContent = 'General';
+            // General or other unit
             if (locationSpan) locationSpan.textContent = 'Assam';
             if (periodSpan) periodSpan.textContent = 'FY 2026-27';
             if (statusSpan) {
@@ -4722,7 +4723,7 @@
 
         // Show a helpful toast notification
         if (typeof window.showToast === 'function') {
-            window.showToast(`Switched active audit context to: ${clientName}`, 'success');
+            window.showToast(`Switched active audit unit to: ${unitName} (Apollo International)`, 'success');
         }
     };
 
@@ -7486,7 +7487,7 @@
             }
             const rate = getRate(ROOM_RENT_2021, cleanedRoom);
             if (rate !== null) return rate;
-            return ROOM_RENT_2021["DELUXE"] || 1600;
+            return ROOM_RENT_2021["DELUXE"] || ROOM_RENT_2021["DELUXE CABIN"] || 1600;
         }
         
         const simpleRoom = toSimpleRoom(cleanedRoom);
