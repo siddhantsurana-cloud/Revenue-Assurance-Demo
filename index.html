@@ -1523,6 +1523,7 @@
         .filter-brick.brick-undercharged::before { background-color: var(--warning); }
         .filter-brick.brick-notfound::before { background-color: #d946ef; } /* Purple/magenta */
         .filter-brick.brick-ignored::before { background-color: #6b7280; } /* Gray */
+        .filter-brick.brick-errors::before { background-color: var(--danger); }
 
         .filter-brick.active {
             border-color: var(--primary);
@@ -1535,6 +1536,21 @@
         .filter-brick.active.brick-undercharged { border-color: var(--warning); box-shadow: 0 0 10px rgba(245, 158, 11, 0.15); }
         .filter-brick.active.brick-notfound { border-color: #d946ef; box-shadow: 0 0 10px rgba(217, 70, 239, 0.15); }
         .filter-brick.active.brick-ignored { border-color: #6b7280; box-shadow: 0 0 10px rgba(107, 114, 128, 0.15); }
+        .filter-brick.active.brick-errors { border-color: var(--danger); box-shadow: 0 0 10px rgba(239, 68, 68, 0.15); }
+
+        /* Validation error rows and input errors */
+        tr.validation-error-row {
+            background-color: rgba(239, 68, 68, 0.04) !important;
+            border-left: 4px solid var(--danger) !important;
+        }
+        .inline-disc-input.input-error {
+            border-color: var(--danger) !important;
+            background-color: var(--danger-bg) !important;
+            color: var(--danger) !important;
+        }
+        .inline-disc-input.input-error:focus {
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+        }
 
         .filter-brick-label {
             font-size: 0.75rem;
@@ -1927,11 +1943,11 @@
             color: var(--primary);
         }
         
-        /* Sandbox Prototype Upgrades (V1.01.05) */
+        /* Sandbox Prototype Upgrades (V1.01.06) */
         
         /* Permanent sandbox indicator strip */
         body.sandbox-active::before {
-            content: "TEST SANDBOX ENVIRONMENT ACTIVE • VERSION V1.01.05 • NO PRODUCTION DATA MODIFICATION" !important;
+            content: "TEST SANDBOX ENVIRONMENT ACTIVE • VERSION V1.01.06 • NO PRODUCTION DATA MODIFICATION" !important;
             height: 28px !important;
             background: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, #d97706 10px, #d97706 20px) !important;
             font-size: 0.72rem !important;
@@ -3022,6 +3038,7 @@
                         <option value="undercharged">Shortly Billed</option>
                         <option value="notfound">Not in Master</option>
                         <option value="ignored">Ignored Exceptions</option>
+                        <option value="errors">Validation Errors</option>
                     </select>
                 </div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
@@ -3063,6 +3080,11 @@
                     <span class="filter-brick-label">Ignored</span>
                     <span class="filter-brick-value" id="brick-val-ignored">0</span>
                     <span class="filter-brick-subtitle">Excluded items</span>
+                </div>
+                <div class="filter-brick brick-errors" onclick="window.selectAuditBrickFilter('errors')">
+                    <span class="filter-brick-label" style="color: var(--danger); font-weight: 700;">Validation Errors</span>
+                    <span class="filter-brick-value" id="brick-val-errors" style="color: var(--danger);">0</span>
+                    <span class="filter-brick-subtitle">Alphanumeric/Formatting mistakes</span>
                 </div>
             </div>
 
@@ -3669,7 +3691,7 @@
                 </div>
                 <!-- Version Badge -->
                 <div id="app-version-badge" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; backdrop-filter: blur(4px);">
-                    LOCKED VERSION: V1.01.05
+                    LOCKED VERSION: V1.01.06
                 </div>
             </div>
         </div>
@@ -3803,7 +3825,7 @@
                     </div>
                     <div id="version-card-title" style="font-size: 0.8rem; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 0.35rem;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        VERSION V1.01.05
+                        VERSION V1.01.06
                     </div>
                     <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45;">
                         Current stable production release representing all tested core components, client overrides, and formatting verification engines.
@@ -4564,7 +4586,7 @@
                 
                 // Update version UI
                 const vBadge = document.getElementById('app-version-badge');
-                if (vBadge) vBadge.textContent = 'TEST VERSION: V1.01.05';
+                if (vBadge) vBadge.textContent = 'TEST VERSION: V1.01.06';
                 const vStatus = document.getElementById('version-card-status');
                 if (vStatus) {
                     vStatus.textContent = 'TESTING';
@@ -4575,11 +4597,11 @@
                     vTitle.style.color = '#d97706';
                     vTitle.innerHTML = `
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        VERSION V1.01.05
+                        VERSION V1.01.06
                     `;
                 }
                 
-                showToast('Switched to Test Sandbox Environment (V1.01.05). Changes are kept in local test storage and will not be pushed to production databases.', 'warning');
+                showToast('Switched to Test Sandbox Environment (V1.01.06). Changes are kept in local test storage and will not be pushed to production databases.', 'warning');
             } else {
                 // Update badge to Production mode
                 envBadge.style.color = 'var(--primary)';
@@ -4596,7 +4618,7 @@
                 
                 // Reset version UI
                 const vBadge = document.getElementById('app-version-badge');
-                if (vBadge) vBadge.textContent = 'LOCKED VERSION: V1.01.05';
+                if (vBadge) vBadge.textContent = 'LOCKED VERSION: V1.01.06';
                 const vStatus = document.getElementById('version-card-status');
                 if (vStatus) {
                     vStatus.textContent = 'LOCKED';
@@ -4607,7 +4629,7 @@
                     vTitle.style.color = 'var(--success)';
                     vTitle.innerHTML = `
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        VERSION V1.01.05
+                        VERSION V1.01.06
                     `;
                 }
                 
@@ -5370,6 +5392,72 @@
         }
     };
 
+    window.updateRowBilledRate = function(uid, value) {
+        let valNum = parseFloat(value);
+        if (isNaN(valNum)) valNum = 0;
+        const row = auditedRows.find(x => x.uid === uid);
+        if (row) {
+            row.rawBilledRateStr = value;
+            row.billedRate = valNum;
+            if (!row.isIgnored && row.status !== "Not Found in Master") {
+                computeRowAuditStatusAndDiff(row);
+            } else if (row.status === "Not Found in Master") {
+                row.diff = valNum;
+            }
+            resetAuditBtn();
+            updateAuditCharts();
+            renderAuditTable();
+            updateTabBadges();
+        }
+    };
+
+    window.updateRowBilledPreDisc = function(uid, value) {
+        let valNum = parseFloat(value);
+        if (isNaN(valNum)) valNum = 0;
+        const row = auditedRows.find(x => x.uid === uid);
+        if (row) {
+            row.rawBilledPreDiscStr = value;
+            row.billedRatePreDiscount = valNum;
+            if (!row.isIgnored && row.status !== "Not Found in Master") {
+                computeRowAuditStatusAndDiff(row);
+            }
+            resetAuditBtn();
+            updateAuditCharts();
+            renderAuditTable();
+            updateTabBadges();
+        }
+    };
+
+    window.updateRowSocRate = function(uid, value) {
+        let valNum = parseFloat(value);
+        if (isNaN(valNum)) valNum = 0;
+        const row = auditedRows.find(x => x.uid === uid);
+        if (row) {
+            row.rawSocRateStr = value;
+            row.socRate = valNum;
+            computeRowAuditStatusAndDiff(row);
+            resetAuditBtn();
+            updateAuditCharts();
+            renderAuditTable();
+            updateTabBadges();
+        }
+    };
+
+    window.updateRowTariffRate = function(uid, value) {
+        let valNum = parseFloat(value);
+        if (isNaN(valNum)) valNum = 0;
+        const row = auditedRows.find(x => x.uid === uid);
+        if (row) {
+            row.rawTariffRateStr = value;
+            row.tariffRate = valNum;
+            computeRowAuditStatusAndDiff(row);
+            resetAuditBtn();
+            updateAuditCharts();
+            renderAuditTable();
+            updateTabBadges();
+        }
+    };
+
     // Brick-style filter selecting handler
     window.selectAuditBrickFilter = function(statusVal) {
         if (auditStatusSelect) {
@@ -5384,7 +5472,8 @@
                 'overcharged': 'brick-overcharged',
                 'undercharged': 'brick-undercharged',
                 'notfound': 'brick-notfound',
-                'ignored': 'brick-ignored'
+                'ignored': 'brick-ignored',
+                'errors': 'brick-errors'
             };
             const activeBrick = document.querySelector(`.filter-brick.${brickMap[statusVal]}`);
             if (activeBrick) {
@@ -9675,6 +9764,14 @@
         const brickUndercharged = document.getElementById('brick-val-undercharged');
         const brickNotfound = document.getElementById('brick-val-notfound');
         const brickIgnored = document.getElementById('brick-val-ignored');
+        const brickErrors = document.getElementById('brick-val-errors');
+
+        let errorsNos = 0;
+        auditedRows.forEach(row => {
+            if (window.hasValidationError(row)) {
+                errorsNos++;
+            }
+        });
 
         if (brickAll) brickAll.textContent = totalCount.toLocaleString();
         if (brickMatching) brickMatching.textContent = matchesCount.toLocaleString();
@@ -9685,6 +9782,7 @@
             const totalExceptionsNos = roundNos + packageNos + consumablesNos + zeroNos + editableNos + pharmacyNos;
             brickIgnored.textContent = totalExceptionsNos.toLocaleString();
         }
+        if (brickErrors) brickErrors.textContent = errorsNos.toLocaleString();
 
         // Hide empty state and show dashboard layer
         const dbEmpty = document.getElementById('dashboard-empty-state');
@@ -9925,6 +10023,75 @@
         });
     }
 
+    window.getRowValidationErrors = function(row) {
+        let errs = {};
+        
+        // Validate Discount Applied
+        if (row.rawDiscountAppliedStr !== undefined && row.rawDiscountAppliedStr !== null) {
+            const s = String(row.rawDiscountAppliedStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.discount = `Discount % '${s}' contains invalid alphanumeric characters.`;
+            } else if (s !== '') {
+                const v = Number(s);
+                if (v < 0 || v > 100) {
+                    errs.discount = `Discount % must be 0-100 (got ${v}%).`;
+                }
+            }
+        }
+        
+        // Validate Expected Tariff (Expected Rate)
+        if (row.rawExpectedTariffStr !== undefined && row.rawExpectedTariffStr !== null) {
+            const s = String(row.rawExpectedTariffStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.expected = `Expected Rate '${s}' contains invalid alphanumeric characters.`;
+            }
+        }
+        
+        // Validate Tariff Rate (Base Tariff Rate)
+        if (row.rawTariffRateStr !== undefined && row.rawTariffRateStr !== null) {
+            const s = String(row.rawTariffRateStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.tariff = `Tariff Rate '${s}' contains invalid alphanumeric characters.`;
+            }
+        }
+        
+        // Validate SOC Rate (Base SOC Rate)
+        if (row.rawSocRateStr !== undefined && row.rawSocRateStr !== null) {
+            const s = String(row.rawSocRateStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.soc = `SOC Rate '${s}' contains invalid alphanumeric characters.`;
+            }
+        }
+        
+        // Validate Billed Rate
+        if (row.rawBilledRateStr !== undefined && row.rawBilledRateStr !== null) {
+            const s = String(row.rawBilledRateStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.billed = `Billed Rate '${s}' contains invalid alphanumeric characters.`;
+            }
+        }
+        
+        // Validate Billed Pre-Discount Rate
+        if (row.rawBilledPreDiscStr !== undefined && row.rawBilledPreDiscStr !== null) {
+            const s = String(row.rawBilledPreDiscStr).trim();
+            if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
+                errs.preDisc = `Billed Pre-Discount Rate '${s}' contains invalid alphanumeric characters.`;
+            }
+        }
+        
+        // Mandatory fields check
+        if (!row.patientName || !row.ipNo || !row.serviceId || row.billedRate === null) {
+            errs.mandatory = `Mandatory fields missing.`;
+        }
+        
+        return errs;
+    };
+
+    window.hasValidationError = function(row) {
+        const errs = window.getRowValidationErrors(row);
+        return Object.keys(errs).length > 0;
+    };
+
     // Filters for Audit results
     function applyAuditFiltersAndSort() {
         const query = auditSearchInput.value.toLowerCase().trim();
@@ -9961,6 +10128,7 @@
                 if (status === 'matching') return row.status === "Matching";
                 if (status === 'notfound') return row.status === "Not Found in Master";
                 if (status === 'ignored') return row.status.startsWith("Ignored") || row.status === "Round Off Difference";
+                if (status === 'errors') return window.hasValidationError(row);
             }
 
             return true;
@@ -10068,7 +10236,13 @@
             let diffHtml = '—';
             let diffPctVal = '—';
 
-            if (row.status === "Overcharged") {
+            // Get validation errors
+            const errors = window.getRowValidationErrors(row);
+            const hasErr = Object.keys(errors).length > 0;
+
+            if (hasErr) {
+                rowClass = 'validation-error-row';
+            } else if (row.status === "Overcharged") {
                 badgeClass = 'badge-danger';
                 rowClass = 'discrepancy-row';
                 diffHtml = `+₹${Math.round(row.diff).toLocaleString('en-IN')}`;
@@ -10088,26 +10262,107 @@
                 badgeClass = 'badge-danger badge-gray'; 
             }
 
+            // Description HTML (with SOC/Tariff Rate errors if any)
+            let descHtml = `<div class="service-name" title="${escapeHtml(row.serviceName)}" style="max-width: 200px;">${escapeHtml(row.serviceName)}</div>`;
+            if (errors.soc && !isEditDisabled) {
+                descHtml += `
+                    <div style="margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem;">
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">SOC Rate:</span>
+                        <input type="text" class="inline-disc-input input-error" style="width: 65px; text-align: left;" value="${escapeHtml(row.rawSocRateStr)}" onchange="window.updateRowSocRate('${row.uid}', this.value)" onclick="event.stopPropagation()">
+                    </div>
+                    <div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.1rem; font-weight: 700;">${escapeHtml(errors.soc)}</div>
+                `;
+            } else if (errors.soc) {
+                descHtml += `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700;">SOC Rate: ${escapeHtml(errors.soc)}</div>`;
+            }
+
+            if (errors.tariff && !isEditDisabled) {
+                descHtml += `
+                    <div style="margin-top: 0.25rem; display: flex; align-items: center; gap: 0.25rem;">
+                        <span style="font-size: 0.7rem; color: var(--text-muted);">Tariff Rate:</span>
+                        <input type="text" class="inline-disc-input input-error" style="width: 65px; text-align: left;" value="${escapeHtml(row.rawTariffRateStr)}" onchange="window.updateRowTariffRate('${row.uid}', this.value)" onclick="event.stopPropagation()">
+                    </div>
+                    <div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.1rem; font-weight: 700;">${escapeHtml(errors.tariff)}</div>
+                `;
+            } else if (errors.tariff) {
+                descHtml += `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700;">Tariff Rate: ${escapeHtml(errors.tariff)}</div>`;
+            }
+
+            // Discount Input HTML
+            const rawDiscount = row.rawDiscountAppliedStr !== undefined && row.rawDiscountAppliedStr !== null ? row.rawDiscountAppliedStr : row.discountApplied;
+            const discountInputHtml = `
+                <input type="text" class="inline-disc-input ${errors.discount ? 'input-error' : ''}" value="${escapeHtml(rawDiscount)}" onclick="event.stopPropagation()" onchange="window.updateRowDiscount('${row.uid}', this.value)" ${isEditDisabled ? 'disabled' : ''}>
+                ${errors.discount ? `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; max-width: 90px; word-break: break-all;" title="${escapeHtml(errors.discount)}">${escapeHtml(errors.discount)}</div>` : ''}
+            `;
+
+            // Billed Rate HTML
+            let billedRateHtml = '';
+            if (errors.billed && !isEditDisabled) {
+                billedRateHtml = `
+                    <input type="text" class="inline-disc-input input-error" style="width: 70px; text-align: right;" value="${escapeHtml(row.rawBilledRateStr)}" onchange="window.updateRowBilledRate('${row.uid}', this.value)" onclick="event.stopPropagation()">
+                    <div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; text-align: right; word-break: break-all;">${escapeHtml(errors.billed)}</div>
+                `;
+            } else {
+                billedRateHtml = formatCurrency(row.billedRate);
+                if (errors.billed) {
+                    billedRateHtml += `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; text-align: right;">${escapeHtml(errors.billed)}</div>`;
+                }
+            }
+
+            // Billed Pre Discount HTML
+            let billedPreDiscHtml = '';
+            if (errors.preDisc && !isEditDisabled) {
+                billedPreDiscHtml = `
+                    <input type="text" class="inline-disc-input input-error" style="width: 70px; text-align: right;" value="${escapeHtml(row.rawBilledPreDiscStr)}" onchange="window.updateRowBilledPreDisc('${row.uid}', this.value)" onclick="event.stopPropagation()">
+                    <div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; text-align: right; word-break: break-all;">${escapeHtml(errors.preDisc)}</div>
+                `;
+            } else {
+                billedPreDiscHtml = formatCurrency(row.billedRatePreDiscount);
+                if (errors.preDisc) {
+                    billedPreDiscHtml += `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; text-align: right;">${escapeHtml(errors.preDisc)}</div>`;
+                }
+            }
+
+            // Expected Tariff Input HTML
+            const rawExpected = row.rawExpectedTariffStr !== undefined && row.rawExpectedTariffStr !== null ? row.rawExpectedTariffStr : (row.expectedTariff !== null ? Math.round(row.expectedTariff) : '');
+            const expectedInputHtml = `
+                <input type="text" class="inline-disc-input ${errors.expected ? 'input-error' : ''}" style="width: 75px;" value="${escapeHtml(rawExpected)}" onclick="event.stopPropagation()" onchange="window.updateRowTariff('${row.uid}', this.value)" ${isEditDisabled ? 'disabled' : ''}>
+                ${errors.expected ? `<div style="color: var(--danger); font-size: 0.65rem; margin-top: 0.2rem; font-weight: 700; max-width: 90px; word-break: break-all;" title="${escapeHtml(errors.expected)}">${escapeHtml(errors.expected)}</div>` : ''}
+            `;
+
+            // Result Badge HTML
+            let resultBadgeHtml = '';
+            if (hasErr) {
+                resultBadgeHtml = `<span class="comparison-badge badge-danger">Validation Error</span>`;
+            } else {
+                resultBadgeHtml = `<span class="comparison-badge ${badgeClass}">${row.status}</span>`;
+            }
+
             html += `
                 <tr class="${rowClass} collapsed-card" id="audit-row-${row.uid}">
                     <td class="always-visible" data-label="Patient Info">
                         <div style="font-weight: 700;">${escapeHtml(row.patientName)}</div>
                         <div style="font-size: 0.75rem; color: var(--text-muted);">${escapeHtml(row.ipNo)}</div>
+                        ${errors.mandatory ? `<div style="color: var(--danger); font-size: 0.65rem; font-weight: 700; margin-top: 0.15rem;">${escapeHtml(errors.mandatory)}</div>` : ''}
                     </td>
                     <td class="always-visible" data-label="Service Code"><span class="service-id">${row.serviceId}</span></td>
-                    <td class="always-visible" data-label="Description"><div class="service-name" title="${escapeHtml(row.serviceName)}" style="max-width: 200px;">${escapeHtml(row.serviceName)}</div></td>
+                    <td class="always-visible" data-label="Description">${descHtml}</td>
                     <td data-label="Room Type"><div class="dept-tag" title="${escapeHtml(row.roomCategory)}" style="max-width: 100px;">${escapeHtml(row.roomCategory || 'Others')}</div></td>
                     <td data-label="Discount %" style="text-align: center;">
-                        <input type="number" min="0" max="100" class="inline-disc-input" value="${row.discountApplied}" onclick="event.stopPropagation()" onchange="window.updateRowDiscount('${row.uid}', this.value)" ${isEditDisabled ? 'disabled' : ''}>
+                        ${discountInputHtml}
                     </td>
-                    <td data-label="Billed Rates" class="rate-cell" style="text-align: right; font-family: 'Book Antiqua', serif;">${formatCurrency(row.billedRate)}</td>
-                    <td data-label="Billed Pre Disc" class="rate-cell" style="text-align: right; font-family: 'Book Antiqua', serif;">${formatCurrency(row.billedRatePreDiscount)}</td>
+                    <td data-label="Billed Rates" class="rate-cell" style="text-align: right; font-family: 'Book Antiqua', serif;">
+                        ${billedRateHtml}
+                    </td>
+                    <td data-label="Billed Pre Disc" class="rate-cell" style="text-align: right; font-family: 'Book Antiqua', serif;">
+                        ${billedPreDiscHtml}
+                    </td>
                     <td data-label="Tariff" class="rate-cell" style="text-align: right;">
-                        <input type="number" min="0" class="inline-disc-input" style="width: 80px;" value="${row.expectedTariff !== null ? Math.round(row.expectedTariff) : ''}" onclick="event.stopPropagation()" onchange="window.updateRowTariff('${row.uid}', this.value)" ${isEditDisabled ? 'disabled' : ''}>
+                        ${expectedInputHtml}
                     </td>
                     <td data-label="Difference" class="rate-cell" style="text-align: right; font-weight: 700; font-family: 'Book Antiqua', serif; color: ${row.status === "Overcharged" ? 'var(--danger)' : (row.status === "Undercharged" ? 'var(--warning)' : 'inherit')}">${diffHtml}</td>
                     <td data-label="Diff %" class="rate-cell" style="text-align: right; font-family: 'Book Antiqua', serif; color: ${row.status === "Overcharged" ? 'var(--danger)' : (row.status === "Undercharged" ? 'var(--warning)' : 'inherit')}">${diffPctVal}</td>
-                    <td data-label="Audit Results" style="text-align: center;" class="always-visible"><span class="comparison-badge ${badgeClass}">${row.status}</span></td>
+                    <td data-label="Audit Results" style="text-align: center;" class="always-visible">${resultBadgeHtml}</td>
                     <td data-label="Details" class="always-visible" style="text-align: center;">
                         <button class="view-btn" onclick="event.stopPropagation(); showAuditDetails('${row.uid}')">
                             <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -10578,73 +10833,16 @@
 
         let errors = [];
         let missingFields = 0;
-        let formatErrorsCount = 0;
 
         auditedRows.forEach((row, idx) => {
             const rowLabel = `Row ${idx + 1} (Patient: ${row.patientName || 'N/A'}, IP: ${row.ipNo || 'N/A'})`;
-
-            // Check mandatory fields
-            if (!row.patientName || !row.ipNo || !row.serviceId || row.billedRate === null) {
-                missingFields++;
-            }
-
-            // Validate Discount Applied for alphanumeric characters
-            if (row.rawDiscountAppliedStr !== undefined && row.rawDiscountAppliedStr !== null) {
-                const s = String(row.rawDiscountAppliedStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: Discount % '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
-                } else if (s !== '') {
-                    const v = Number(s);
-                    if (v < 0 || v > 100) {
-                        errors.push(`${rowLabel}: Discount % must be between 0 and 100 (got ${v}%).`);
-                        formatErrorsCount++;
-                    }
-                }
-            }
-
-            // Validate Expected Tariff (Net Expected Rate)
-            if (row.rawExpectedTariffStr !== undefined && row.rawExpectedTariffStr !== null) {
-                const s = String(row.rawExpectedTariffStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: Expected Rate '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
-                }
-            }
-
-            // Validate Tariff Rate (Base Tariff Rate)
-            if (row.rawTariffRateStr !== undefined && row.rawTariffRateStr !== null) {
-                const s = String(row.rawTariffRateStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: Tariff Rate '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
-                }
-            }
-
-            // Validate SOC Rate (Base SOC Rate)
-            if (row.rawSocRateStr !== undefined && row.rawSocRateStr !== null) {
-                const s = String(row.rawSocRateStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: SOC Rate '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
-                }
-            }
-
-            // Validate Billed Rate
-            if (row.rawBilledRateStr !== undefined && row.rawBilledRateStr !== null) {
-                const s = String(row.rawBilledRateStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: Billed Rate '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
-                }
-            }
-
-            // Validate Billed Pre Discount Rate
-            if (row.rawBilledPreDiscStr !== undefined && row.rawBilledPreDiscStr !== null) {
-                const s = String(row.rawBilledPreDiscStr).trim();
-                if (s !== '' && !/^-?[0-9]+(\.[0-9]+)?$/.test(s)) {
-                    errors.push(`${rowLabel}: Billed Pre-Discount Rate '${s}' contains invalid alphanumeric/non-numeric characters.`);
-                    formatErrorsCount++;
+            const rowErrs = window.getRowValidationErrors(row);
+            
+            for (const key in rowErrs) {
+                if (key === 'mandatory') {
+                    missingFields++;
+                } else {
+                    errors.push(`${rowLabel}: ${rowErrs[key]}`);
                 }
             }
         });
