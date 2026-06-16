@@ -4373,6 +4373,8 @@
                         <thead>
                             <tr style="background: var(--bg-hover);">
                                 <th style="padding: 0.5rem; width: 120px; color: var(--text-main);">Rule Type</th>
+                                <th style="padding: 0.5rem; width: 120px; color: var(--text-main);">Service ID</th>
+                                <th style="padding: 0.5rem; width: 200px; color: var(--text-main);">Service Name</th>
                                 <th style="padding: 0.5rem; width: 150px; color: var(--text-main);">Category Scope</th>
                                 <th style="padding: 0.5rem; width: 150px; color: var(--text-main);">Limit Value (₹)</th>
                                 <th style="padding: 0.5rem; color: var(--text-main);">Logical Condition</th>
@@ -5309,32 +5311,44 @@
 
         // Register PWA Service Worker with auto-refresh on update
         if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js")
-                    .then(reg => {
-                        console.log("Service Worker registered successfully:", reg.scope);
-                        reg.addEventListener('updatefound', () => {
-                            const newWorker = reg.installing;
-                            if (newWorker) {
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        console.log("New content available. Refreshing...");
-                                        window.location.reload();
-                                    }
-                                });
+            // For local development and test mode (index_v2_test.html), unregister Service Worker to prevent caching and ERR_FAILED errors
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.pathname.includes('index_v2_test')) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (let registration of registrations) {
+                        registration.unregister().then(success => {
+                            if (success) {
+                                console.log("Service Worker unregistered successfully for local testing.");
                             }
                         });
-                    })
-                    .catch(err => console.error("Service Worker registration failed:", err));
-            });
-
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (!refreshing) {
-                    refreshing = true;
-                    window.location.reload();
-                }
-            });
+                    }
+                });
+            } else {
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                });
+                window.addEventListener("load", () => {
+                    navigator.serviceWorker.register("./sw.js")
+                        .then(reg => {
+                            console.log("Service Worker registered successfully:", reg.scope);
+                            reg.addEventListener('updatefound', () => {
+                                const newWorker = reg.installing;
+                                if (newWorker) {
+                                    newWorker.addEventListener('statechange', () => {
+                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                            console.log("New content available. Refreshing...");
+                                            window.location.reload();
+                                        }
+                                    });
+                                }
+                            });
+                        })
+                        .catch(err => console.error("Service Worker registration failed:", err));
+                });
+            }
         }
     }
 
@@ -12521,18 +12535,27 @@
         
         window.tempAgreement.services[idx][prop] = val;
 
-        // Auto-fill logic
+        const tbody = document.getElementById('modal-services-tbody');
+        const row = tbody ? tbody.rows[idx] : null;
+
+        // Auto-fill logic without focus loss
         if (prop === 'serviceId') {
             const item = findServiceById(val);
             if (item) {
                 window.tempAgreement.services[idx]['serviceName'] = item.desc || '';
-                renderServiceOverridesTable();
+                if (row) {
+                    const nameInput = row.cells[1].querySelector('input');
+                    if (nameInput) nameInput.value = item.desc || '';
+                }
             }
         } else if (prop === 'serviceName') {
             const item = findServiceByDesc(val);
             if (item) {
                 window.tempAgreement.services[idx]['serviceId'] = item.id || '';
-                renderServiceOverridesTable();
+                if (row) {
+                    const idInput = row.cells[0].querySelector('input');
+                    if (idInput) idInput.value = item.id || '';
+                }
             }
         }
 
@@ -12622,18 +12645,27 @@
     window.updateTempPackage = function(idx, prop, val) {
         window.tempPackageList[idx][prop] = val;
         
-        // Auto-fill logic
+        const tbody = document.getElementById('modal-packages-tbody');
+        const row = tbody ? tbody.rows[idx] : null;
+
+        // Auto-fill logic without focus loss
         if (prop === 'serviceId') {
             const item = findServiceById(val);
             if (item) {
                 window.tempPackageList[idx]['serviceName'] = item.desc || '';
-                renderPackagesTable();
+                if (row) {
+                    const nameInput = row.cells[1].querySelector('input');
+                    if (nameInput) nameInput.value = item.desc || '';
+                }
             }
         } else if (prop === 'serviceName') {
             const item = findServiceByDesc(val);
             if (item) {
                 window.tempPackageList[idx]['serviceId'] = item.id || '';
-                renderPackagesTable();
+                if (row) {
+                    const idInput = row.cells[0].querySelector('input');
+                    if (idInput) idInput.value = item.id || '';
+                }
             }
         }
         
@@ -12696,18 +12728,27 @@
         
         window.tempAgreement.chargingMethods[idx][prop] = val;
 
-        // Auto-fill logic
+        const tbody = document.getElementById('modal-methods-tbody');
+        const row = tbody ? tbody.rows[idx] : null;
+
+        // Auto-fill logic without focus loss
         if (prop === 'serviceId') {
             const item = findServiceById(val);
             if (item) {
                 window.tempAgreement.chargingMethods[idx]['serviceName'] = item.desc || '';
-                renderChargingMethodsTable();
+                if (row) {
+                    const nameInput = row.cells[1].querySelector('input');
+                    if (nameInput) nameInput.value = item.desc || '';
+                }
             }
         } else if (prop === 'serviceName') {
             const item = findServiceByDesc(val);
             if (item) {
                 window.tempAgreement.chargingMethods[idx]['serviceId'] = item.id || '';
-                renderChargingMethodsTable();
+                if (row) {
+                    const idInput = row.cells[0].querySelector('input');
+                    if (idInput) idInput.value = item.id || '';
+                }
             }
         }
 
@@ -12741,6 +12782,8 @@
                         <option value="Co-payment" ${item.ruleType === 'Co-payment' ? 'selected' : ''}>Co-payment</option>
                     </select>
                 </td>
+                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-id-datalist" value="${escapeHtml(item.serviceId || '')}" oninput="updateTempRule(${idx}, 'serviceId', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536"></td>
+                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-desc-datalist" value="${escapeHtml(item.serviceName || '')}" oninput="updateTempRule(${idx}, 'serviceName', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional name"></td>
                 <td style="padding: 0.35rem 0.5rem;">
                     <select onchange="updateTempRule(${idx}, 'category', this.value)" style="width:100%; padding:0.35rem; background:var(--bg-page); border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;">
                         <option value="Room Rent" ${item.category === 'Room Rent' ? 'selected' : ''}>Room Rent</option>
@@ -12749,25 +12792,49 @@
                         <option value="Total Bill" ${item.category === 'Total Bill' ? 'selected' : ''}>Total Bill</option>
                     </select>
                 </td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="number" step="any" value="${item.value}" oninput="updateTempRule(${idx}, 'value', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 5000"></td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" value="${escapeHtml(item.condition)}" oninput="updateTempRule(${idx}, 'condition', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. qty > 3"></td>
+                <td style="padding: 0.35rem 0.5rem;"><input type="number" step="any" value="${item.value !== null && item.value !== undefined ? item.value : ''}" oninput="updateTempRule(${idx}, 'value', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 5000"></td>
+                <td style="padding: 0.35rem 0.5rem;"><input type="text" value="${escapeHtml(item.condition || '')}" oninput="updateTempRule(${idx}, 'condition', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. qty > 3"></td>
                 <td style="padding: 0.35rem 0.5rem; text-align:center;"><button onclick="deleteTempRule(${idx})" class="export-btn" style="padding:0.2rem 0.4rem; background:rgba(239,68,68,0.1); color:var(--danger); border-color:rgba(239,68,68,0.2);">Delete</button></td>
             </tr>
-        `).join('') || '<tr><td colspan="5" style="text-align:center; padding:1rem; color:var(--text-muted);">No rules configured.</td></tr>';
+        `).join('') || '<tr><td colspan="7" style="text-align:center; padding:1rem; color:var(--text-muted);">No rules configured.</td></tr>';
     };
 
     window.updateTempRule = function(idx, prop, val) {
         if (!window.tempAgreement.rules) window.tempAgreement.rules = [];
+        window.tempAgreement.rules[idx][prop] = val;
+
+        const tbody = document.getElementById('modal-rules-tbody');
+        const row = tbody ? tbody.rows[idx] : null;
+
+        // Auto-fill logic without focus loss
+        if (prop === 'serviceId') {
+            const item = findServiceById(val);
+            if (item) {
+                window.tempAgreement.rules[idx]['serviceName'] = item.desc || '';
+                if (row) {
+                    const nameInput = row.cells[2].querySelector('input');
+                    if (nameInput) nameInput.value = item.desc || '';
+                }
+            }
+        } else if (prop === 'serviceName') {
+            const item = findServiceByDesc(val);
+            if (item) {
+                window.tempAgreement.rules[idx]['serviceId'] = item.id || '';
+                if (row) {
+                    const idInput = row.cells[1].querySelector('input');
+                    if (idInput) idInput.value = item.id || '';
+                }
+            }
+        }
+
         if (prop === 'value') {
-            window.tempAgreement.rules[idx][prop] = parseFloat(val) || 0;
-        } else {
-            window.tempAgreement.rules[idx][prop] = val;
+            window.tempAgreement.rules[idx][prop] = val === "" ? 0 : parseFloat(val);
         }
     };
 
     window.addModalRuleRow = function() {
         if (!window.tempAgreement.rules) window.tempAgreement.rules = [];
-        window.tempAgreement.rules.push({ ruleType: 'Cap', category: 'Room Rent', value: 0, condition: '' });
+        window.tempAgreement.rules.push({ ruleType: 'Cap', serviceId: '', serviceName: '', category: 'Room Rent', value: 0, condition: '' });
         renderRulesTable();
     };
 
@@ -13450,11 +13517,36 @@
         // Step 9: Apply Conditional Rules
         if (agreement.rules && agreement.rules.length > 0) {
             agreement.rules.forEach(rule => {
-                if (rule.ruleType === "Cap") {
+                let ruleApplies = false;
+                if (rule.serviceId) {
+                    if (String(item.serviceId).trim() === String(rule.serviceId).trim()) {
+                        ruleApplies = true;
+                    }
+                } else {
                     if (rule.category === "Room Rent" && isRoomRentService) {
-                        if (res.expectedTariff > rule.value) {
+                        ruleApplies = true;
+                    } else if (rule.category === "Pharmacy" && (deptLower.includes('pharmacy') || nameUpper.includes('HSN:') || nameUpper.includes('PHARMACY') || deptLower.includes('drug'))) {
+                        ruleApplies = true;
+                    } else if (rule.category === "Consumables" && (
+                        deptLower === 'consumables' || 
+                        nameUpper.includes('CONSUMABLE') || 
+                        deptLower.includes('material') || 
+                        nameUpper.includes('CONSU:')
+                    )) {
+                        ruleApplies = true;
+                    }
+                }
+
+                if (ruleApplies) {
+                    if (rule.ruleType === "Cap") {
+                        const rateToCompare = res.expectedTariff !== null ? res.expectedTariff : billedRate;
+                        if (rateToCompare > rule.value) {
                             res.expectedTariff = rule.value;
-                            res.explanation += ` Room rent capped at ₹${rule.value} per agreement rules.`;
+                            const scopeLabel = rule.serviceId ? `Service #${rule.serviceId}` : rule.category;
+                            res.explanation += ` ${scopeLabel} capped at ₹${rule.value} per agreement rules.`;
+                            if (res.expectedTariff !== item.billedRate) {
+                                res.exceptionCode = "OC";
+                            }
                         }
                     }
                 }

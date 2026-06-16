@@ -2231,7 +2231,8 @@
       "PRIVATE DELUXE": 9610,
       "DELUXE": 11050,
       "SUITE": 13350,
-      "MAHARAJA SUITE": 16680
+      "MAHARAJA SUITE": 16680,
+      "DAY CARE": 5650
     }
   },
   {
@@ -2741,7 +2742,8 @@
       "PRIVATE DELUXE": 14840,
       "DELUXE": 17060,
       "SUITE": 20620,
-      "MAHARAJA SUITE": 25780
+      "MAHARAJA SUITE": 25780,
+      "DAY CARE": 8750
     }
   },
   {
@@ -4415,7 +4417,7 @@
       "NNICU - 1": 1000,
       "NNICU - 2": 1000,
       "NNICU - 3": 1000,
-      "Emergency": 1000
+      "EMERGENCY": 1000
     }
   },
   {
@@ -4454,7 +4456,8 @@
       "STROKE HDU": 6600,
       "NNICU - 1": 2000,
       "NNICU - 2": 3700,
-      "NNICU - 3": 6600
+      "NNICU - 3": 6600,
+      "EMERGENCY": 0
     }
   },
   {
@@ -4530,6 +4533,21 @@
       "DELUXE": 0,
       "SUITE": 0,
       "MAHARAJA SUITE": 0
+    }
+  },
+  {
+    "id": "3057717",
+    "name": "PCCG - MONITORING CHARGES",
+    "type": "Non Invasive Procedure",
+    "dept": "Critical Care",
+    "rates": {
+      "STANDARD": 2760,
+      "SEMI-PRIVATE": 2760,
+      "PRIVATE": 2760,
+      "PRIVATE DELUXE": 2760,
+      "DELUXE": 2760,
+      "SUITE": 2760,
+      "MAHARAJA SUITE": 2760
     }
   },
   {

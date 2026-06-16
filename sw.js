@@ -53,9 +53,14 @@ self.addEventListener("fetch", event => {
         }
         return networkResponse;
       })
-      .catch(() => {
+      .catch(err => {
         // Fall back to cache when offline
-        return caches.match(event.request);
+        return caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          throw err; // Re-throw network error instead of returning undefined (avoids ERR_FAILED)
+        });
       })
   );
 });
