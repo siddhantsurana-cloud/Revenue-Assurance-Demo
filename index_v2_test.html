@@ -1943,11 +1943,11 @@
             color: var(--primary);
         }
         
-        /* Sandbox Prototype Upgrades (V1.02.01-TEST) */
+        /* Sandbox Prototype Upgrades (V1.2.1) */
         
         /* Permanent sandbox indicator strip */
         body.sandbox-active::before {
-            content: "TEST SANDBOX ENVIRONMENT ACTIVE • VERSION V1.02.01-TEST • NO PRODUCTION DATA MODIFICATION" !important;
+            content: "TEST SANDBOX ENVIRONMENT ACTIVE • VERSION V1.2.1 • NO PRODUCTION DATA MODIFICATION" !important;
             height: 28px !important;
             background: repeating-linear-gradient(45deg, #f59e0b, #f59e0b 10px, #d97706 10px, #d97706 20px) !important;
             font-size: 0.72rem !important;
@@ -2080,7 +2080,7 @@
     </style>
 </head>
 <body>
-<div style="background: #ffc107; color: #000; text-align: center; padding: 0.5rem; font-weight: bold; position: sticky; top: 0; z-index: 10000; border-bottom: 2px solid #e0a800;">⚗️ DEVELOPMENT – DO NOT DEPLOY (Version V1.02.01-TEST)</div>
+<div style="background: #ffc107; color: #000; text-align: center; padding: 0.5rem; font-weight: bold; position: sticky; top: 0; z-index: 10000; border-bottom: 2px solid #e0a800;">⚗️ DEVELOPMENT – DO NOT DEPLOY (Version V1.2.1)</div>
 
     <!-- FULL PAGE PORTAL LOGIN -->
     <div id="full-page-login" class="full-page-login">
@@ -3762,7 +3762,7 @@
                 </div>
                 <!-- Version Badge -->
                 <div id="app-version-badge" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; backdrop-filter: blur(4px);">
-                    LOCKED VERSION: V1.02.01-TEST
+                    LOCKED VERSION: V1.2.1
                 </div>
             </div>
         </div>
@@ -3896,7 +3896,7 @@
                     </div>
                     <div id="version-card-title" style="font-size: 0.8rem; font-weight: 800; color: var(--success); display: flex; align-items: center; gap: 0.35rem;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        VERSION V1.02.01-TEST
+                        VERSION V1.2.1
                     </div>
                     <div style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.45;">
                         Current stable production release representing all tested core components, client overrides, and formatting verification engines.
@@ -4857,7 +4857,7 @@
                 
                 // Update version UI
                 const vBadge = document.getElementById('app-version-badge');
-                if (vBadge) vBadge.textContent = 'TEST VERSION: V1.02.01-TEST';
+                if (vBadge) vBadge.textContent = 'TEST VERSION: V1.2.1';
                 const vStatus = document.getElementById('version-card-status');
                 if (vStatus) {
                     vStatus.textContent = 'TESTING';
@@ -4868,11 +4868,11 @@
                     vTitle.style.color = '#d97706';
                     vTitle.innerHTML = `
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                        VERSION V1.02.01-TEST
+                        VERSION V1.2.1
                     `;
                 }
                 
-                showToast('Switched to Test Sandbox Environment (V1.02.01-TEST). Changes are kept in local test storage and will not be pushed to production databases.', 'warning');
+                showToast('Switched to Test Sandbox Environment (V1.2.1). Changes are kept in local test storage and will not be pushed to production databases.', 'warning');
             } else {
                 // Update badge to Production mode
                 envBadge.style.color = 'var(--primary)';
@@ -4889,7 +4889,7 @@
                 
                 // Reset version UI
                 const vBadge = document.getElementById('app-version-badge');
-                if (vBadge) vBadge.textContent = 'LOCKED VERSION: V1.02.01-TEST';
+                if (vBadge) vBadge.textContent = 'LOCKED VERSION: V1.2.1';
                 const vStatus = document.getElementById('version-card-status');
                 if (vStatus) {
                     vStatus.textContent = 'LOCKED';
@@ -4900,7 +4900,7 @@
                     vTitle.style.color = 'var(--success)';
                     vTitle.innerHTML = `
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        VERSION V1.02.01-TEST
+                        VERSION V1.2.1
                     `;
                 }
                 
@@ -15088,7 +15088,7 @@
         }
     }
 
-    const CREDS_CACHE_VERSION = 'V1.02.01-TEST';
+    const CREDS_CACHE_VERSION = 'V1.2.1';
 
     async function initUserCredentials() {
         const defaultFallback = [
