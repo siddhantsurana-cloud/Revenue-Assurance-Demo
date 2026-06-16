@@ -8702,8 +8702,78 @@
             row.isManuallyOverridden = true;
             computeRowAuditStatusAndDiff(row);
             
-            // Refresh views
+            // Auto-save/update this discount override to the respective custom agreement
+            if (row.customer && row.serviceId) {
+                if (!window.customAgreements) window.customAgreements = [];
+                let targetAg = null;
+                const matchedAg = findMatchingAgreement(row.customer);
+                
+                if (matchedAg) {
+                    targetAg = window.customAgreements.find(x => x.agreementName.toUpperCase() === matchedAg.agreementName.toUpperCase());
+                    if (!targetAg) {
+                        // Clone static agreement into custom agreements
+                        targetAg = {
+                            agreementName: matchedAg.agreementName,
+                            payerName: matchedAg.payerName || matchedAg.agreementName,
+                            businessUnit: matchedAg.businessUnit || getAgreementScope(matchedAg) || 'both',
+                            fromDate: matchedAg.fromDate || '01-04-2026',
+                            toDate: matchedAg.toDate || '31-03-2027',
+                            status: matchedAg.status || 'Available/Valid',
+                            remarks: matchedAg.remarks || 'Auto-created from audit override',
+                            departments: JSON.parse(JSON.stringify(matchedAg.departments || [])),
+                            services: JSON.parse(JSON.stringify(matchedAg.services || [])),
+                            rooms: JSON.parse(JSON.stringify(matchedAg.rooms || [])),
+                            packages: JSON.parse(JSON.stringify(matchedAg.packages || { inclusions: [], exclusions: [] })),
+                            chargingMethods: JSON.parse(JSON.stringify(matchedAg.chargingMethods || [])),
+                            rules: JSON.parse(JSON.stringify(matchedAg.rules || []))
+                        };
+                        window.customAgreements.push(targetAg);
+                    }
+                } else {
+                    const targetName = row.customer.trim();
+                    targetAg = window.customAgreements.find(x => x.agreementName.toUpperCase() === targetName.toUpperCase());
+                    if (!targetAg) {
+                        targetAg = {
+                            agreementName: targetName,
+                            payerName: targetName,
+                            businessUnit: window.currentUserUnit || 'both',
+                            fromDate: '01-04-2026',
+                            toDate: '31-03-2027',
+                            status: 'Available/Valid',
+                            remarks: 'Auto-created from audit override',
+                            departments: [],
+                            services: [],
+                            rooms: [],
+                            packages: { inclusions: [], exclusions: [] },
+                            chargingMethods: [],
+                            rules: []
+                        };
+                        window.customAgreements.push(targetAg);
+                    }
+                }
 
+                if (targetAg) {
+                    if (!targetAg.services) targetAg.services = [];
+                    const sId = String(row.serviceId).trim();
+                    const sIndex = targetAg.services.findIndex(s => String(s.serviceId).trim() === sId);
+                    if (sIndex !== -1) {
+                        targetAg.services[sIndex].discount = valNum;
+                        if (row.serviceName) {
+                            targetAg.services[sIndex].serviceName = row.serviceName.trim();
+                        }
+                    } else {
+                        targetAg.services.push({
+                            serviceId: sId,
+                            serviceName: (row.serviceName || '').trim(),
+                            rate: null,
+                            discount: valNum
+                        });
+                    }
+                    window.saveAndSyncCustomAgreements(window.customAgreements);
+                }
+            }
+
+            // Refresh views
             resetAuditBtn();
             updateAuditCharts();
             renderAuditTable();
@@ -12479,6 +12549,173 @@
         return found;
     }
 
+    // Autocomplete Suggestions logic for Services (15,000+ items)
+    let cachedAllServices = null;
+    function getAllServices() {
+        if (cachedAllServices) return cachedAllServices;
+        const unique = new Map();
+        if (typeof TARIFF_DATA !== 'undefined' && Array.isArray(TARIFF_DATA)) {
+            TARIFF_DATA.forEach(x => {
+                if (x.id) {
+                    unique.set(String(x.id).trim(), {
+                        id: String(x.id).trim(),
+                        desc: String(x.desc || '').trim()
+                    });
+                }
+            });
+        }
+        if (typeof TARIFF_KOLKATA_SOC !== 'undefined' && Array.isArray(TARIFF_KOLKATA_SOC)) {
+            TARIFF_KOLKATA_SOC.forEach(x => {
+                const id = String(x.id).trim();
+                if (x.id && !unique.has(id)) {
+                    unique.set(id, {
+                        id: id,
+                        desc: String(x.desc || '').trim()
+                    });
+                }
+            });
+        }
+        cachedAllServices = Array.from(unique.values());
+        return cachedAllServices;
+    }
+
+    function showAutocompleteSuggestions(input) {
+        const parentTd = input.closest('td');
+        if (!parentTd) return;
+        const suggestionsDiv = parentTd.querySelector('.autocomplete-suggestions');
+        if (!suggestionsDiv) return;
+
+        const isIdInput = input.classList.contains('autocomplete-service-id');
+        const val = input.value.trim().toLowerCase();
+
+        const services = getAllServices();
+        let filtered = [];
+
+        if (!val) {
+            filtered = services.slice(0, 30);
+        } else {
+            if (isIdInput) {
+                filtered = services.filter(x => x.id.toLowerCase().includes(val)).slice(0, 30);
+            } else {
+                filtered = services.filter(x => x.desc.toLowerCase().includes(val)).slice(0, 30);
+            }
+        }
+
+        if (filtered.length === 0) {
+            suggestionsDiv.innerHTML = `<div style="padding:0.5rem; color:var(--text-muted); font-size:0.8rem; text-align:center;">No services found</div>`;
+        } else {
+            suggestionsDiv.innerHTML = filtered.map(item => `
+                <div class="suggestion-item" 
+                     style="padding: 0.4rem 0.6rem; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.8rem; color: var(--text-main); transition: background 0.15s;"
+                     onmouseover="this.style.background='var(--primary-bg)'; this.style.color='var(--primary)';" 
+                     onmouseout="this.style.background=''; this.style.color='';"
+                     data-id="${escapeHtml(item.id)}" 
+                     data-desc="${escapeHtml(item.desc)}">
+                    <strong style="color: var(--primary);">${escapeHtml(item.id)}</strong> - ${escapeHtml(item.desc)}
+                </div>
+            `).join('');
+        }
+        suggestionsDiv.style.display = 'block';
+    }
+
+    function selectAutocompleteSuggestion(input, id, desc) {
+        const idx = parseInt(input.getAttribute('data-idx'));
+        const type = input.getAttribute('data-type');
+        const isIdInput = input.classList.contains('autocomplete-service-id');
+
+        const val = isIdInput ? id : desc;
+        input.value = val;
+
+        const row = input.closest('tr');
+        const idInput = row ? row.querySelector('.autocomplete-service-id') : null;
+        const descInput = row ? row.querySelector('.autocomplete-service-desc') : null;
+        if (idInput) idInput.value = id;
+        if (descInput) descInput.value = desc;
+
+        if (type === 'services') {
+            if (typeof window.updateTempService === 'function') {
+                window.updateTempService(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+            }
+        } else if (type === 'packages') {
+            if (typeof window.updateTempPackage === 'function') {
+                window.updateTempPackage(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+            }
+        } else if (type === 'methods') {
+            if (typeof window.updateTempMethod === 'function') {
+                window.updateTempMethod(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+            }
+        } else if (type === 'rules') {
+            if (typeof window.updateTempRule === 'function') {
+                window.updateTempRule(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+            }
+        }
+
+        const parentTd = input.closest('td');
+        if (parentTd) {
+            const suggestionsDiv = parentTd.querySelector('.autocomplete-suggestions');
+            if (suggestionsDiv) suggestionsDiv.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.autocomplete-suggestions') && !e.target.classList.contains('autocomplete-service-id') && !e.target.classList.contains('autocomplete-service-desc')) {
+            document.querySelectorAll('.autocomplete-suggestions').forEach(div => div.style.display = 'none');
+            return;
+        }
+
+        const suggestionItem = e.target.closest('.suggestion-item');
+        if (suggestionItem) {
+            const suggestionsDiv = suggestionItem.closest('.autocomplete-suggestions');
+            const input = suggestionsDiv ? suggestionsDiv.previousElementSibling : null;
+            if (input) {
+                const id = suggestionItem.getAttribute('data-id');
+                const desc = suggestionItem.getAttribute('data-desc');
+                selectAutocompleteSuggestion(input, id, desc);
+            }
+        }
+    });
+
+    document.addEventListener('focusin', e => {
+        if (e.target.classList.contains('autocomplete-service-id') || e.target.classList.contains('autocomplete-service-desc')) {
+            document.querySelectorAll('.autocomplete-suggestions').forEach(div => {
+                if (div !== e.target.nextElementSibling) {
+                    div.style.display = 'none';
+                }
+            });
+            showAutocompleteSuggestions(e.target);
+        }
+    });
+
+    document.addEventListener('input', e => {
+        if (e.target.classList.contains('autocomplete-service-id') || e.target.classList.contains('autocomplete-service-desc')) {
+            showAutocompleteSuggestions(e.target);
+            
+            const input = e.target;
+            const idx = parseInt(input.getAttribute('data-idx'));
+            const type = input.getAttribute('data-type');
+            const isIdInput = input.classList.contains('autocomplete-service-id');
+            const val = input.value;
+            
+            if (type === 'services') {
+                if (typeof window.updateTempService === 'function') {
+                    window.updateTempService(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+                }
+            } else if (type === 'packages') {
+                if (typeof window.updateTempPackage === 'function') {
+                    window.updateTempPackage(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+                }
+            } else if (type === 'methods') {
+                if (typeof window.updateTempMethod === 'function') {
+                    window.updateTempMethod(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+                }
+            } else if (type === 'rules') {
+                if (typeof window.updateTempRule === 'function') {
+                    window.updateTempRule(idx, isIdInput ? 'serviceId' : 'serviceName', val);
+                }
+            }
+        }
+    });
+
     // Inline Table Editor: Departments
     window.renderDeptDiscountsTable = function() {
         const tbody = document.getElementById('modal-depts-tbody');
@@ -12521,8 +12758,14 @@
         const list = window.tempAgreement.services || [];
         tbody.innerHTML = list.map((item, idx) => `
             <tr>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-id-datalist" value="${escapeHtml(item.serviceId)}" oninput="updateTempService(${idx}, 'serviceId', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536"></td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-desc-datalist" value="${escapeHtml(item.serviceName)}" oninput="updateTempService(${idx}, 'serviceName', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. Chemotherapy Low"></td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-id" data-idx="${idx}" data-type="services" value="${escapeHtml(item.serviceId)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-desc" data-idx="${idx}" data-type="services" value="${escapeHtml(item.serviceName)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. Chemotherapy Low" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
                 <td style="padding: 0.35rem 0.5rem;"><input type="number" step="any" value="${item.rate !== null && item.rate !== undefined ? item.rate : ''}" oninput="updateTempService(${idx}, 'rate', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Fixed Rate"></td>
                 <td style="padding: 0.35rem 0.5rem;"><input type="number" step="any" value="${item.discount !== null && item.discount !== undefined ? item.discount : ''}" oninput="updateTempService(${idx}, 'discount', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Discount %"></td>
                 <td style="padding: 0.35rem 0.5rem; text-align:center;"><button onclick="deleteTempService(${idx})" class="export-btn" style="padding:0.2rem 0.4rem; background:rgba(239,68,68,0.1); color:var(--danger); border-color:rgba(239,68,68,0.2);">Delete</button></td>
@@ -12629,8 +12872,14 @@
         window.tempPackageList = list;
         tbody.innerHTML = list.map((item, idx) => `
             <tr>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-id-datalist" value="${escapeHtml(item.serviceId)}" oninput="updateTempPackage(${idx}, 'serviceId', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536"></td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-desc-datalist" value="${escapeHtml(item.serviceName)}" oninput="updateTempPackage(${idx}, 'serviceName', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional description"></td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-id" data-idx="${idx}" data-type="packages" value="${escapeHtml(item.serviceId)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-desc" data-idx="${idx}" data-type="packages" value="${escapeHtml(item.serviceName)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional description" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
                 <td style="padding: 0.35rem 0.5rem;">
                     <select onchange="updateTempPackage(${idx}, 'type', this.value)" style="width:100%; padding:0.35rem; background:var(--bg-page); border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;">
                         <option value="Inclusion" ${item.type === 'Inclusion' ? 'selected' : ''}>Inclusion</option>
@@ -12707,8 +12956,14 @@
         const list = window.tempAgreement.chargingMethods || [];
         tbody.innerHTML = list.map((item, idx) => `
             <tr>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-id-datalist" value="${escapeHtml(item.serviceId)}" oninput="updateTempMethod(${idx}, 'serviceId', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 1051057"></td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-desc-datalist" value="${escapeHtml(item.serviceName)}" oninput="updateTempMethod(${idx}, 'serviceName', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional description"></td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-id" data-idx="${idx}" data-type="methods" value="${escapeHtml(item.serviceId)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 1051057" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-desc" data-idx="${idx}" data-type="methods" value="${escapeHtml(item.serviceName)}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional description" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
                 <td style="padding: 0.35rem 0.5rem;">
                     <select onchange="updateTempMethod(${idx}, 'method', this.value)" style="width:100%; padding:0.35rem; background:var(--bg-page); border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;">
                         <option value="Per Day" ${item.method === 'Per Day' ? 'selected' : ''}>Per Day</option>
@@ -12782,8 +13037,14 @@
                         <option value="Co-payment" ${item.ruleType === 'Co-payment' ? 'selected' : ''}>Co-payment</option>
                     </select>
                 </td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-id-datalist" value="${escapeHtml(item.serviceId || '')}" oninput="updateTempRule(${idx}, 'serviceId', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536"></td>
-                <td style="padding: 0.35rem 0.5rem;"><input type="text" list="modal-service-desc-datalist" value="${escapeHtml(item.serviceName || '')}" oninput="updateTempRule(${idx}, 'serviceName', this.value)" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional name"></td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-id" data-idx="${idx}" data-type="rules" value="${escapeHtml(item.serviceId || '')}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="e.g. 99536" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
+                <td style="padding: 0.35rem 0.5rem; position: relative;">
+                    <input type="text" class="autocomplete-service-desc" data-idx="${idx}" data-type="rules" value="${escapeHtml(item.serviceName || '')}" style="width:100%; padding:0.35rem; background:transparent; border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;" placeholder="Optional name" autocomplete="off">
+                    <div class="autocomplete-suggestions" style="display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 3000; background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; box-shadow: var(--card-shadow); margin-top: 2px;"></div>
+                </td>
                 <td style="padding: 0.35rem 0.5rem;">
                     <select onchange="updateTempRule(${idx}, 'category', this.value)" style="width:100%; padding:0.35rem; background:var(--bg-page); border:1px solid var(--border); color:var(--text-main); font-size:0.8rem; border-radius:4px;">
                         <option value="Room Rent" ${item.category === 'Room Rent' ? 'selected' : ''}>Room Rent</option>
