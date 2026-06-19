@@ -1,97 +1,73 @@
 [
   {
-    "username": "Review",
-    "password": "Apollo@123",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Viewer",
     "unit": "excelcare"
   },
   {
-    "username": "BRC",
-    "password": "Brc@2013",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Auditor",
     "unit": "excelcare"
   },
   {
-    "username": "BRC1",
-    "password": "Brc@2026",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Approver",
     "unit": "excelcare"
   },
   {
-    "username": "admin",
-    "password": "Admin@Excel",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Administrator",
     "unit": "excelcare"
   },
   {
-    "username": "Review",
-    "password": "Apollo@123",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Viewer",
     "unit": "international"
   },
   {
-    "username": "BRC",
-    "password": "Brc@2013",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Auditor",
     "unit": "international"
   },
   {
-    "username": "BRC1",
-    "password": "Brc@2026",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Approver",
     "unit": "international"
   },
   {
-    "username": "admin",
-    "password": "Admin@Intl",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Administrator",
     "unit": "international"
   },
   {
-    "username": "Review",
-    "password": "Apollo@123",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Viewer",
     "unit": "kolkata"
   },
   {
-    "username": "BRC",
-    "password": "Brc@2013",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Auditor",
     "unit": "kolkata"
   },
   {
-    "username": "BRC1",
-    "password": "Brc@2026",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Approver",
     "unit": "kolkata"
   },
   {
-    "username": "admin",
-    "password": "Admin@Kolkata",
-    "role": "Administrator",
-    "unit": "kolkata"
-  },
-  {
-    "username": "kol_viewer",
-    "password": "Viewer@Kolkata",
-    "role": "Viewer",
-    "unit": "kolkata"
-  },
-  {
-    "username": "kol_auditor",
-    "password": "Auditor@Kolkata",
-    "role": "Auditor",
-    "unit": "kolkata"
-  },
-  {
-    "username": "kol_reviewer",
-    "password": "Reviewer@Kolkata",
-    "role": "Approver",
-    "unit": "kolkata"
-  },
-  {
-    "username": "kol_admin",
-    "password": "Admin@Kolkata",
+    "username": "BRCDEMO",
+    "password": "BRCDEMO",
     "role": "Administrator",
     "unit": "kolkata"
   }

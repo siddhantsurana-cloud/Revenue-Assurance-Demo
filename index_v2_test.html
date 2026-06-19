@@ -7174,7 +7174,7 @@
             let currentUnit = window.currentUserUnit || 'all';
 
             // Master Admin check
-            if (username.toLowerCase() === 'admin' && pwd === 'Siddhant@$26') {
+            if (username.toLowerCase() === 'brcadmin' && pwd === 'BRCADMIN') {
                 if (role === 'Administrator') {
                     isValid = true;
                     currentUnit = 'all'; // Elevate/maintain global access
@@ -15225,29 +15225,25 @@
         }
     }
 
-    const CREDS_CACHE_VERSION = 'V1.2.1';
+    const CREDS_CACHE_VERSION = 'V1.2.2-DEMO';
 
     async function initUserCredentials() {
         const defaultFallback = [
             // Excelcare Unit
-            { username: 'Review', password: 'Apollo@123', role: 'Viewer', unit: 'excelcare' },
-            { username: 'BRC', password: 'Brc@2013', role: 'Auditor', unit: 'excelcare' },
-            { username: 'BRC1', password: 'Brc@2026', role: 'Approver', unit: 'excelcare' },
-            { username: 'admin', password: 'Admin@Excel', role: 'Administrator', unit: 'excelcare' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'excelcare' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'excelcare' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'excelcare' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'excelcare' },
             // International Unit
-            { username: 'Review', password: 'Apollo@123', role: 'Viewer', unit: 'international' },
-            { username: 'BRC', password: 'Brc@2013', role: 'Auditor', unit: 'international' },
-            { username: 'BRC1', password: 'Brc@2026', role: 'Approver', unit: 'international' },
-            { username: 'admin', password: 'Admin@Intl', role: 'Administrator', unit: 'international' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'international' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'international' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'international' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'international' },
             // Kolkata Unit
-            { username: 'Review', password: 'Apollo@123', role: 'Viewer', unit: 'kolkata' },
-            { username: 'BRC', password: 'Brc@2013', role: 'Auditor', unit: 'kolkata' },
-            { username: 'BRC1', password: 'Brc@2026', role: 'Approver', unit: 'kolkata' },
-            { username: 'admin', password: 'Admin@Kolkata', role: 'Administrator', unit: 'kolkata' },
-            { username: 'kol_viewer', password: 'Viewer@Kolkata', role: 'Viewer', unit: 'kolkata' },
-            { username: 'kol_auditor', password: 'Auditor@Kolkata', role: 'Auditor', unit: 'kolkata' },
-            { username: 'kol_reviewer', password: 'Reviewer@Kolkata', role: 'Approver', unit: 'kolkata' },
-            { username: 'kol_admin', password: 'Admin@Kolkata', role: 'Administrator', unit: 'kolkata' }
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'kolkata' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'kolkata' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'kolkata' },
+            { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'kolkata' }
         ];
 
         // Bust stale localStorage if version has changed
@@ -15557,10 +15553,10 @@
                 };
                 
                 if (unit === 'all') {
-                    // Global Website Master Admin (CA Siddhant Surana only)
-                    if (username.toLowerCase() === 'admin' && password === 'Siddhant@$26') {
+                    // Global Website Master Admin
+                    if (username.toLowerCase() === 'brcadmin' && password === 'BRCADMIN') {
                         isValid = true;
-                        loggedInUser = { username: 'admin', role: 'Administrator', unit: 'all' };
+                        loggedInUser = { username: 'BRCADMIN', role: 'Administrator', unit: 'all' };
                     }
                 } else {
                     // Try local credentials first (fast path)
@@ -15896,16 +15892,22 @@
         if (confirm(confirmMsg)) {
             const defaults = [
                 // Excelcare Unit defaults
-                { username: 'Review', password: 'Apollo@123', role: 'Viewer', unit: 'excelcare' },
-                { username: 'BRC', password: 'Brc@2013', role: 'Auditor', unit: 'excelcare' },
-                { username: 'BRC1', password: 'Brc@2026', role: 'Approver', unit: 'excelcare' },
-                { username: 'admin', password: 'Admin@Excel', role: 'Administrator', unit: 'excelcare' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'excelcare' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'excelcare' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'excelcare' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'excelcare' },
                 
                 // International Unit defaults
-                { username: 'Review', password: 'Apollo@123', role: 'Viewer', unit: 'international' },
-                { username: 'BRC', password: 'Brc@2013', role: 'Auditor', unit: 'international' },
-                { username: 'BRC1', password: 'Brc@2026', role: 'Approver', unit: 'international' },
-                { username: 'admin', password: 'Admin@Intl', role: 'Administrator', unit: 'international' }
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'international' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'international' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'international' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'international' },
+                
+                // Kolkata Unit defaults
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Viewer', unit: 'kolkata' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Auditor', unit: 'kolkata' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Approver', unit: 'kolkata' },
+                { username: 'BRCDEMO', password: 'BRCDEMO', role: 'Administrator', unit: 'kolkata' }
             ];
 
             if (currentUnit === 'all') {
